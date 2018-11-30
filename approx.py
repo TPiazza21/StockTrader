@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 from weather import Weather, Unit
 from pytrends.request import TrendReq
 import time
+import requests
+import alpha_vantage
+import json
 
 # useful constants
 pytrends = TrendReq(hl="en-US", tz=360)
