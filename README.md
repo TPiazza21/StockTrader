@@ -1,6 +1,8 @@
 # StockTrader
 Final Project for CS 182 at Harvard for Tyler Piazza, Sebastian Revel, William Hartog
 
+General Things to know (and errors to not be worried about):
+
 Things that must be downloaded for this to work:
 - pip install alpha_vantage
 - pip install weather-api
@@ -12,6 +14,19 @@ return float(self.data[symbol]["05. price"])
 TypeError: string indices must be integers
 
 it likely means that you have called the API too recently, so you are getting an error message from the API call as a string instead of the data itself
+
+Also, don't be worried about Google errors, they are par for the course when getting google trends data
+
+Workflow:
+
+- apiCaller contains a class that calls the APIs. This is necessary so that it can call the APIs, and then the other agents can use it. You shouldn't have to worry too much about this class, as long as you update the information regularly.
+
+- generalAgent has a class that will be our general framework for the agent. PLEASE USE THIS CLASS AS A PARENT CLASS so that the relevent data can be saved easily
+
+- approxAgent has a class that extends generalAgent, and implements approximate Q learning
+
+- run_approx_save_csv will run a simple approx agent, getting new data every minute, and it saved results to a .csv file
+
 
 
 
