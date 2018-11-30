@@ -1,6 +1,6 @@
 # Tyler Piazza, 11/27
 # made for calling APIs, so we only do it once in a minute
-#SEB
+
 # import the necessary things from these files
 # https://pypi.org/project/weather-api/
 # https://pypi.org/project/pytrends/
