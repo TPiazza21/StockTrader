@@ -1,4 +1,5 @@
 # Sebastian Revel
+
 from stockAgent import stockAgent
 from time import sleep
 
