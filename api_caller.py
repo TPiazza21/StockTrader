@@ -82,7 +82,7 @@ class APICaller:
       self.feature_dict[city + " humidity"] = float(location.atmosphere.humidity)
 
     # update google trending info for each word
-    historical_info = self.pytrends.get_historical_interest(self.company_names,year_start=2018, month_start=11, day_start=24, hour_start=0, year_end=2018, month_end=12, day_end=25, hour_end=0, cat=0, geo = 'US', gprop='', sleep=0)
+    historical_info = self.pytrends.get_historical_interest(self.company_names,year_start=2018, month_start=12, day_start=1, hour_start=0, year_end=2018, month_end=12, day_end=25, hour_end=0, cat=0, geo = 'US', gprop='', sleep=0)
     for name in self.company_names:
       # don't worry about the 3 Google errors here... it's fine
       self.feature_dict[name + " trend"] = float(historical_info[name][-1])
