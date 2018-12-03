@@ -1,3 +1,4 @@
+# Sebastian Revel
 import requests
 import alpha_vantage
 import json
