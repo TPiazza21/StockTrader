@@ -4,6 +4,8 @@
 
 # you should change the
 
+import copy
+
 HOLD = 0
 SELL = 1
 BUY = 2
@@ -30,7 +32,7 @@ class generalAgent:
           self.portfolio[symbol] = 100
 
         # do not change this
-        self.initial_portfolio = self.portfolio
+        self.initial_portfolio = copy.deepcopy(self.portfolio)
 
         # List of transactions in the form of a triple (Company, BUY/SELL/HOLD, numberOfShares)
         # Was thinking this would be useful to just keep track of, then update our portfolio all
@@ -66,7 +68,9 @@ class generalAgent:
 
     # Returns current net worth
     def getNetWorth(self):
-        self.netWorth = self.getAssets() + self.getCash()
+        the_assets = self.getAssets()
+        the_cash = self.getCash()
+        self.netWorth = the_assets + the_cash
         return self.netWorth
     # Returns current cash
     def getCash(self):
@@ -102,7 +106,7 @@ class generalAgent:
     def buyStock(self, symbol, amount=1):
         currentPrice = self.fetchPrice(symbol)
         while(currentPrice == None):
-            currentPrice = self.getPrice(symbol)
+            currentPrice = self.fetchPrice(symbol)
         cost = currentPrice * amount
         if cost > self.cash:
             return None

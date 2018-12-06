@@ -87,7 +87,7 @@ class approxAgent(generalAgent):
     #self.interesting_numbers["only feature right now"] = self.past_prices["AAPL"][0] - self.past_prices["AAPL"][1]
     for symbol in self.symbols:
       self.interesting_numbers[symbol + " discrete derivative"] = self.past_prices[symbol][0] - self.past_prices[symbol][1]
-      self.interesting_numbers[symbol + " volume"] = self.feature_dict[symbol + " volume"]
+      #self.interesting_numbers[symbol + " volume"] = self.feature_dict[symbol + " volume"]
 
 
 
