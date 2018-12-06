@@ -126,6 +126,23 @@ class APICaller:
   def return_last_prices(self):
     return copy.deepcopy(self.past_prices)
 
+  def take_in_array(self, arr, key_arr):
+    # update that dictionary
+    self.feature_dict = {}
+    for i, key in enumerate(key_arr):
+      self.feature_dict[key] = float(arr[i])
+
+    for symbol in symbols:
+      #price = self.getPrice(symbol)
+      #self.feature_dict[symbol + " price"] = price
+      price = self.feature_dict[symbol + " price"]
+      # put price at the beginning of past prices
+      self.past_prices[symbol] = [price] + self.past_prices[symbol]
+      # only remember at most fixed number
+      if len(self.past_prices[symbol]) > self.prices_to_remember:
+        self.past_prices[symbol].pop()
+
+
 
 """
 tester = APICaller()

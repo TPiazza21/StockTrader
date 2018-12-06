@@ -13,21 +13,24 @@ class generalAgent:
         # Portfolio of stocks owned in a dictionary
         # (For ex: {AAPL: 3} means you own 3 shares of Apple)
         self.portfolio = {}
-        # Total cash value - starting out with some cash
-        self.cash = 1000.0
+        # Total cash value - starting out with some cash, a lot of cash
+        self.cash = 100000000.0
+        self.initial_cash = self.cash
         # Total portfolio value
         self.assets = 0.0
         # Total cash and assets values (NOT JUST UNINVESTED CASH)
         self.netWorth = self.cash + self.assets
 
-        # need to update the symbols
         self.symbols = ["AAPL", "MSFT", "AMZN", "FB"]
-        #self.actions = [HOLD, SELL, BUY]
+        #self.symbols = ["AAPL"]
         self.actions = [SELL, BUY]
 
         # start out with 100 shares in each
         for symbol in self.symbols:
           self.portfolio[symbol] = 100
+
+        # do not change this
+        self.initial_portfolio = self.portfolio
 
         # List of transactions in the form of a triple (Company, BUY/SELL/HOLD, numberOfShares)
         # Was thinking this would be useful to just keep track of, then update our portfolio all
@@ -49,6 +52,18 @@ class generalAgent:
     # Adds value to cash
     def addValue(self, val):
         self.cash += val
+
+
+    # this is the money you would have if you did nothing...
+    def get_comparison(self):
+        # assume that you have the current prices
+        accumulator = self.initial_cash
+        for symbol in self.symbols:
+            accumulator += self.fetchPrice(symbol) * self.initial_portfolio[symbol]
+
+        return accumulator
+
+
     # Returns current net worth
     def getNetWorth(self):
         self.netWorth = self.getAssets() + self.getCash()
@@ -101,7 +116,7 @@ class generalAgent:
     # (also adds it to our pending list)
     # Returns None if we do not own any shares
     def sellStock(self, symbol, amount=1):
-        if (not symbol in self.portfolio) or (self.portfolio[symbol] > amount):
+        if (not symbol in self.portfolio) or (self.portfolio[symbol] < amount):
             return None
 
         currentPrice = self.fetchPrice(symbol)
@@ -120,21 +135,13 @@ class generalAgent:
 
     # always deals with amount of 1
     def doTransactions(self, actions = [BUY, BUY, SELL, HOLD]):
-        print "at doTransactions with actions " + str(actions)
         for i, action in enumerate(actions):
-
             symbol = self.symbols[i]
-            print "enumerating, the action is " + str(action)
-            print BUY
-            print SELL
-            print (BUY == action)
             if action == BUY:
-                "supposedly buying"
                 self.buyStock(symbol)
-            if action == SELL:
-                "supposedly selling"
+            elif action == SELL:
                 self.sellStock(symbol)
-            else: # HOLD
+            elif action == HOLD: # HOLD
                 self.holdStock(symbol)
         self.updatePortfolio()
 
