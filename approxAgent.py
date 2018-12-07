@@ -11,10 +11,17 @@ class approxAgent(generalAgent):
   # be explicit about which features you want
   def __init__(self):
     generalAgent.__init__(self)
+
+    #self.symbols = ["AAPL"]
+
+
+
+
     self.weights = {}
     # weights are a dictionary of dictionaries
     for symbol in self.symbols:
       self.weights[symbol] = {}
+
 
     self.first_move = True
     self.past_actions = {} # dictionary of past actions
@@ -45,13 +52,14 @@ class approxAgent(generalAgent):
     # if you did BUY
     # then reward is price now - price before (times 1)
     if self.past_actions[symbol] == BUY:
-      print "computing reward for buy, prices: " + str(self.past_prices[symbol][0]) + ", " + str(self.past_prices[symbol][1])
+      #print "computing reward for buy, prices: " + str(self.past_prices[symbol][0]) + ", " + str(self.past_prices[symbol][1])
       reward = float(self.past_prices[symbol][0]) - float(self.past_prices[symbol][1])
     # opposite for sell, and 0 for hold
     elif self.past_actions[symbol] == SELL:
-      print "computing reward for sell, prices: " + str(self.past_prices[symbol][0]) + ", " + str(self.past_prices[symbol][1])
+      #print "past prices is " + str(self.past_prices[symbol])
+      #print "computing reward for sell, prices: " + str(self.past_prices[symbol][0]) + ", " + str(self.past_prices[symbol][1])
       reward =  float(self.past_prices[symbol][1]) - float(self.past_prices[symbol][0])
-      print "the actual reward from those subtractions are " + str(reward)
+      #print "the actual reward from those subtractions are " + str(reward)
 
     elif self.past_actions[symbol] == HOLD:
       reward =  self.past_prices[symbol][1] - self.past_prices[symbol][0]
@@ -73,7 +81,16 @@ class approxAgent(generalAgent):
 
   def compute_interesting_numbers(self):
     # compute derivative, etc. using feature dictionary that we have
-    self.interesting_numbers = self.feature_dict
+    # only one weight right now
+    #for symbol in self.symbols:
+    #self.interesting_numbers[symbol + " price"] = self.feature_dict[symbol + " price"]
+    #self.interesting_numbers["only feature right now"] = self.past_prices["AAPL"][0] - self.past_prices["AAPL"][1]
+    for symbol in self.symbols:
+      self.interesting_numbers[symbol + " discrete derivative"] = self.past_prices[symbol][0] - self.past_prices[symbol][1]
+      #self.interesting_numbers[symbol + " volume"] = self.feature_dict[symbol + " volume"]
+
+
+
 
     # initialize the weights
     if (self.first_move):
@@ -92,7 +109,6 @@ class approxAgent(generalAgent):
       # pick action that maximizes the q_val
       for action in self.actions:
         q_val = self.compute_Q(action, symbol)
-        #print "looking at q_val, gets " + str(q_val)
         if q_val > best_q:
           best_action = action
           best_q = q_val
@@ -127,18 +143,20 @@ class approxAgent(generalAgent):
         if q_val > best_q:
           best_q = q_val
       # difference = r + discount * max_{a'}Q(s',a') - Q(s,a)
-      print "reward is " + str(self.reward(symbol))
+      # print "reward is " + str(self.reward(symbol))
       difference = (self.reward(symbol) + self.discount * best_q) - self.past_q[symbol]
 
       # w_i <- w_i + a * difference * f_i(s,a)
       for key in self.interesting_numbers:
         # probably an issue with past_f
-        print "alpha is " + str(self.alpha)
-        print "difference is " + str(difference)
-        print "past f is " + str(self.past_f[key])
+        #print "alpha is " + str(self.alpha)
+        #print "difference is " + str(difference)
+        #print "past f is " + str(self.past_f[key])
+        #print "current weight is " + str(self.weights[symbol][key])
 
         self.weights[symbol][key] = self.weights[symbol][key] + self.alpha * difference * self.past_f[key]
-        print "updated weight is now " + str(self.weights[symbol][key])
+        if abs(self.weights[symbol][key]) > 10 ** 20:
+          print "weight is very big: updated weight is now " + str(self.weights[symbol][key])
 
     # so we remember what the old f was
     for key in self.interesting_numbers:

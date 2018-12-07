@@ -4,7 +4,6 @@ import alpha_vantage
 import json
 import stockScrape
 
- # USE (pip install alpha_vantage)
 
 HOLD = 0
 SELL = 1

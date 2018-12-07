@@ -82,7 +82,7 @@ class APICaller:
       self.feature_dict[city + " humidity"] = float(location.atmosphere.humidity)
 
     # update google trending info for each word
-    historical_info = self.pytrends.get_historical_interest(self.company_names,year_start=2018, month_start=11, day_start=24, hour_start=0, year_end=2018, month_end=12, day_end=25, hour_end=0, cat=0, geo = 'US', gprop='', sleep=0)
+    historical_info = self.pytrends.get_historical_interest(self.company_names,year_start=2018, month_start=12, day_start=1, hour_start=0, year_end=2018, month_end=12, day_end=25, hour_end=0, cat=0, geo = 'US', gprop='', sleep=0)
     for name in self.company_names:
       # don't worry about the 3 Google errors here... it's fine
       self.feature_dict[name + " trend"] = float(historical_info[name][-1])
@@ -125,6 +125,23 @@ class APICaller:
 
   def return_last_prices(self):
     return copy.deepcopy(self.past_prices)
+
+  def take_in_array(self, arr, key_arr):
+    # update that dictionary
+    self.feature_dict = {}
+    for i, key in enumerate(key_arr):
+      self.feature_dict[key] = float(arr[i])
+
+    for symbol in symbols:
+      #price = self.getPrice(symbol)
+      #self.feature_dict[symbol + " price"] = price
+      price = self.feature_dict[symbol + " price"]
+      # put price at the beginning of past prices
+      self.past_prices[symbol] = [price] + self.past_prices[symbol]
+      # only remember at most fixed number
+      if len(self.past_prices[symbol]) > self.prices_to_remember:
+        self.past_prices[symbol].pop()
+
 
 
 """

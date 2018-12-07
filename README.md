@@ -27,6 +27,8 @@ Workflow:
 
 - run_approx_save_csv will run a simple approx agent, getting new data every minute, and it saved results to a .csv file
 
+- retrievingData will in genral contain our .csv files, both from pulling data (stock prices, weather, etc.) and from testing things (how does an approx agent do?). Ask me (Tyler) if there are any questions on the table values, but in general I put how the agent did, how a base case agent would do (i.e. someone that neither bought nor sold at all during the day), and then the difference 
+
 
 
 
