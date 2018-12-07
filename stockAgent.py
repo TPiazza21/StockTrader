@@ -2,6 +2,7 @@
 import requests
 import alpha_vantage
 import json
+import stockScrape
 
  # USE (pip install alpha_vantage)
 
@@ -55,30 +56,19 @@ class stockAgent:
 
     # Gets information on a given company all at once and stores it in our dictionary of all our companies data.
     def findData(self, symbol):
-        API_URL = "https://www.alphavantage.co/query"
-
-        data = {
-            "function": "GLOBAL_QUOTE",
-            "symbol": symbol,
-            "outputsize": "compact",
-            "datatype": "json",
-            "apikey": "UN9WC1EV8ZP8EX2U"
-            }
-        response = requests.get(API_URL, params=data)
-        data = response.json()
-        for d in data:
-            self.data.update({symbol: data[d]})
+        dictionary = stockScrape.stockScraper(symbol)
+        self.data.update(dictionary)
 
     # Gets the current price of a company under a given symbol
     def getPrice(self, symbol):
-        return float(self.data[symbol]["05. price"])
+        return float(self.data[symbol][0])
     # Gets the current percent change of a company under a given symbol for that day
     def getPercentChange(self, symbol):
-        x = (self.data[symbol]["10. change percent"])
-        return float(x.strip('%'))/100
+        x = (self.data[symbol][1])
+        return float(x)
     # Gets the amount of shares sold for a company for that day
     def getVolume(self, symbol):
-       return float(self.data[symbol]["06. volume"])
+        return float(self.data[symbol][2])
 
     # Buying a given number of shares of one company, updating assets, cash, and networth.
     # (also adds it to our pending list)
