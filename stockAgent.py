@@ -1,8 +1,39 @@
 # Sebastian Revel
+
+"""
+READ ME - TYLER
+
+
+
+YOU SHOULD BE USING GENERAL AGENT, NOT STOCK AGENT, AS A TEMPLATE.
+
+
+
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import requests
 import alpha_vantage
 import json
 import stockScrape
+
+#
 
 
 HOLD = 0
