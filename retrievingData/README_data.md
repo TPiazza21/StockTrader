@@ -6,7 +6,9 @@ Raw Data: (which was generally run via the python file "get_data.py" BEWARE SAVI
 
 first_data.csv -- this file is from Monday December 3rd, 11:15am, and it only lasted about an hour and a half. Note that this file has price info only from FB, MSFT, AMZN, and AAPL. This also contains weather info. Note that there was some kind of error in which it didn't record points for a few minutes
 
-second_data.csv -- this file is from Tuesday, December 10th, 10:06am, and it ran until about 3pm that day (with data from about every single minute). This also includes additional price info, from the 4 before but also from SHAK, WEN, NFLX, TSLA, MCD. This data is preferred for data testing
+second_data.csv -- this file is from Monday, December 10th, 10:06am, and it ran until about 3pm that day (with data from about every single minute). This also includes additional price info, from the 4 before but also from SHAK, WEN, NFLX, TSLA, MCD. This data is preferred for data testing
+
+third_data.csv -- this file is from Thursday, December 13th, 10:02am, ran until about 3pm that day. Same info from second_data (i.e. same price info and same weather info)
 
 Agent data:
 
