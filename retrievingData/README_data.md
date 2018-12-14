@@ -10,6 +10,8 @@ second_data.csv -- this file is from Monday, December 10th, 10:06am, and it ran 
 
 third_data.csv -- this file is from Thursday, December 13th, 10:02am, ran until about 3pm that day. Same info from second_data (i.e. same price info and same weather info)
 
+fourth_data.csv -- this file is from Friday, December 14th, 10:00am to about 3pm. Same info as previous 2 raw files
+
 Agent data:
 
 FROM FIRST_DATA.CSV (i.e. the agent runs, as if it was the same time as first_data.csv)

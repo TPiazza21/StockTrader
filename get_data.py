@@ -1,5 +1,5 @@
 # Tyler Piazza
-# 12/13
+# 12/14
 # get data
 
 from api_caller import APICaller
@@ -13,10 +13,13 @@ import csv
 
 # number of minutes to wait. If I get up at 7:50am, a 2 hour wait should be good
 # make sure battery settings are good
-waittime = 135
+
+# starting at 1 am, ish. if not running by 11am, something is fishy
+waittime = 60 * 9
 print "starting the waittime - make sure battery is fine"
 time.sleep(waittime * 60)
 print "finished the waittime"
+
 
 # takes about 3.877 seconds for this to be called first
 api_source = APICaller()
@@ -40,9 +43,9 @@ remember_rows.append(keys)
 print keys
 counter = 0
 print "just starting the counter"
-print "PLEASE DOUBLE CHECK THAT YOU CHANGED THE FILENAME TO SAVE"
+print "PLEASE DOUBLE CHECK THAT YOU CHANGED THE FILENAME TO SAVE, and that battery life is fine"
 print "IF YOU FORGOT, CANCEL IMMEDIATELY"
-file_name = 'retrievingData/fourth_data.csv'
+file_name = 'retrievingData/fifth_data.csv'
 failure_message = False
 while counter < minutes_to_run:
 
