@@ -2,6 +2,26 @@
 # 11/28/18
 # this file is meant to be where we can test various agents - for now, they are approximate agents
 
+
+
+
+
+
+
+
+
+"""
+
+
+12/14
+Don't use this as a template for running agents, because this uses LIVE DATA
+check out pull_csv_run_agent for how to run your agent
+
+
+
+
+
+"""
 from api_caller import APICaller
 from generalAgent import generalAgent
 from approxAgent import approxAgent

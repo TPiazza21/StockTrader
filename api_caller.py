@@ -18,11 +18,9 @@ import json
 
 # useful constants
 pytrends = TrendReq(hl="en-US", tz=360)
-#symbols = ["AAPL", "MSFT", "AMZN", "FB"]
-
 HOLD = 0
-SELL = 1
-BUY = 2
+SELL = -1
+BUY = 1
 
 
 # this is the class that gets the feature information... it calls the necessary APIs.
@@ -32,42 +30,24 @@ class APICaller:
     self.weather_cities = ["new york city", "boston", "los angeles"]
     self.company_names = ["apple", "microsoft", "amazon", "facebook"]
     self.pytrends = TrendReq(hl="en-US", tz=360)
-    # self.symbols = ["AAPL", "MSFT", "AMZN", "FB"]
     self.symbols = ["AAPL", "MSFT", "AMZN", "FB", "NFLX", "MCD", "WEN", "SHAK", "TSLA"]
     # used to store price, percentChange, volume
     self.data = {}
-
-    self.prices_to_remember = 5
+    self.prices_to_remember = 30
     # remember a certain number of past prices (a list) for each symbol
     self.past_prices = {}
     for symbol in self.symbols:
       self.past_prices[symbol] = []
 
 
-  # these 4 methods (findData, getPrice, getPercentChange, getVolume) are copied from Sebastian's work
+  # findData will use the stockScraper class to pull data, unless there's an issue
   def findData(self, symbol):
-      """
-        API_URL = "https://www.alphavantage.co/query"
-        data = {
-            "function": "GLOBAL_QUOTE",
-            "symbol": symbol,
-            "outputsize": "compact",
-            "datatype": "json",
-            "apikey": "UN9WC1EV8ZP8EX2U"
-            }
-        response = requests.get(API_URL, params=data)
-        data = response.json()
-        for d in data:
-            self.data.update({symbol: data[d]})
-      """
       try:
         dictionary = stockScrape.stockScraper(symbol)
         self.data.update(dictionary)
         return 1
       except:
         return 0
-
-
 
   # Gets the current price of a company under a given symbol
   def getPrice(self, symbol):
@@ -76,10 +56,13 @@ class APICaller:
   def getPercentChange(self, symbol):
       return float(self.data[symbol][1])
 
-      #return float(x.strip('%'))/100
   # Gets the amount of shares sold for a company for that day
   def getVolume(self, symbol):
      return float(self.data[symbol][2])
+
+
+
+
 
 
   # we need to call this EVERY time that we are updating i.e. once a minute
@@ -153,8 +136,6 @@ class APICaller:
       self.feature_dict[key] = float(arr[i])
 
     for symbol in self.symbols:
-      #price = self.getPrice(symbol)
-      #self.feature_dict[symbol + " price"] = price
       price = self.feature_dict[symbol + " price"]
       # put price at the beginning of past prices
       self.past_prices[symbol] = [price] + self.past_prices[symbol]
@@ -162,13 +143,6 @@ class APICaller:
       if len(self.past_prices[symbol]) > self.prices_to_remember:
         self.past_prices[symbol].pop()
 
-
-
-"""
-tester = APICaller()
-tester.update_values()
-tester.print_features()
-"""
 
 
 
