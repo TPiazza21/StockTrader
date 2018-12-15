@@ -11,10 +11,6 @@ class approxAgent(generalAgent):
   # be explicit about which features you want
   def __init__(self):
     generalAgent.__init__(self)
-
-    # just so we don't deal with too many at a time for now
-    self.symbols = ["FB"]
-
     self.weights = {}
     # weights are a dictionary of dictionaries
     for symbol in self.symbols:
@@ -25,7 +21,9 @@ class approxAgent(generalAgent):
     self.past_actions = {} # dictionary of past actions
 
     self.keys = [] # need to populate eventually
-    self.interesting_numbers = {} # similar to feature_dict
+    self.interesting_numbers = {} # to store interesting numbers for each symbol
+    for symbol in self.symbols:
+      self.interesting_numbers[symbol] = {}
 
     self.discount = 0.99
 
@@ -37,6 +35,8 @@ class approxAgent(generalAgent):
 
     # dictionary of past f_i(s,a) from the last time
     self.past_f = {}
+    for symbol in self.symbols:
+      self.past_f[symbol] = {}
 
 
   def reward(self, symbol):
@@ -57,35 +57,33 @@ class approxAgent(generalAgent):
     elif self.past_actions[symbol] == HOLD:
       reward = 0.
 
-
     return reward
 
-  def compute_f(self, action, key):
+  def compute_f(self, action, key, symbol):
     # naive version. eventually have other options
-    return self.interesting_numbers[key] * action
+    return self.interesting_numbers[symbol][key] * action
 
   def compute_Q(self, action, symbol):
     # maybe deal with different Q formulations later, but for now use naive
     q_value = 0
-    for key in self.interesting_numbers:
-      q_value += (self.weights[symbol])[key] * self.compute_f(action, key)
+    for key in self.interesting_numbers[symbol]:
+      q_value += (self.weights[symbol])[key] * self.compute_f(action, key, symbol)
     return q_value
 
 
   def compute_interesting_numbers(self):
     # compute derivative, etc. using feature dictionary that we have
-    # only one weight right now
-    #for symbol in self.symbols:
-    #self.interesting_numbers[symbol + " price"] = self.feature_dict[symbol + " price"]
-    self.interesting_numbers["only feature right now"] = self.moving_average_convergence_difference("FB")
-
-    #self.past_prices["AAPL"][0] - self.past_prices["AAPL"][1]
+    for symbol in self.symbols:
+      self.interesting_numbers[symbol]["MACD"] = self.moving_average_convergence_difference(symbol)
+      self.interesting_numbers[symbol]["SMA diff"] = self.fetchPrice(symbol) - self.simple_moving_average(symbol)
+      self.interesting_numbers[symbol]["simple derivative"] = self.past_prices[symbol][0] - self.past_prices[symbol][1]
 
 
     # initialize the weights
     if (self.first_move):
-      for key in self.interesting_numbers:
-        for symbol in self.symbols:
+
+      for symbol in self.symbols:
+        for key in self.interesting_numbers[symbol]:
           (self.weights[symbol])[key] = 0
 
   def decide(self):
@@ -112,8 +110,9 @@ class approxAgent(generalAgent):
     else:
       self.first_move = False
       # so we remember what the old f was
-      for key in self.interesting_numbers:
-        self.past_f[key] = self.compute_f(action, key)
+      for symbol in self.symbols:
+        for key in self.interesting_numbers[symbol]:
+          self.past_f[symbol][key] = self.compute_f(action, key, symbol)
 
     for i, symbol in enumerate(self.symbols):
       self.past_actions[symbol] = actions[i]
@@ -138,15 +137,15 @@ class approxAgent(generalAgent):
       difference = (self.reward(symbol) + self.discount * best_q) - self.past_q[symbol]
 
       # w_i <- w_i + a * difference * f_i(s,a)
-      for key in self.interesting_numbers:
-        self.weights[symbol][key] = self.weights[symbol][key] + self.alpha * difference * self.past_f[key]
+      for key in self.interesting_numbers[symbol]:
+        self.weights[symbol][key] = self.weights[symbol][key] + self.alpha * difference * self.past_f[symbol][key]
         if abs(self.weights[symbol][key]) > 10 ** 20:
           print "weight is very big: updated weight is now " + str(self.weights[symbol][key])
 
       # so we remember what the old f was
-      for key in self.interesting_numbers:
+      for key in self.interesting_numbers[symbol]:
         # you need it to be the best action
-        self.past_f[key] = self.compute_f(best_action, key)
+        self.past_f[symbol][key] = self.compute_f(best_action, key, symbol)
 
     # update the learning rate, slowly
     self.alpha = (1. / 1.1) ** (self.t)

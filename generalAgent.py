@@ -4,11 +4,7 @@
 
 
 import copy
-"""
-HOLD = 0
-SELL = 1
-BUY = 2
-"""
+
 
 HOLD = 0
 SELL = -1
@@ -167,6 +163,7 @@ class generalAgent:
             currentPrice = self.fetchPrice(symbol)
         cost = currentPrice * amount
         if cost > self.cash:
+            print "you can't afford this"
             return None
         transaction = (symbol, BUY, amount)
         self.cash = self.cash - cost
