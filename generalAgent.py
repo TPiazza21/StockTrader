@@ -1,14 +1,19 @@
 # generalAgent
 # Tyler Piazza
-# 11/28/18
+# Sebastian Revel
+# 12/14/18
 
-# you should change the
 
 import copy
-
+"""
 HOLD = 0
 SELL = 1
 BUY = 2
+"""
+
+HOLD = 0
+SELL = -1
+BUY = 1
 
 class generalAgent:
     def __init__(self):
@@ -23,13 +28,12 @@ class generalAgent:
         # Total cash and assets values (NOT JUST UNINVESTED CASH)
         self.netWorth = self.cash + self.assets
 
-        self.symbols = ["AAPL", "MSFT", "AMZN", "FB"]
-        #self.symbols = ["AAPL"]
-        self.actions = [SELL, BUY]
+        self.symbols = ["AAPL", "MSFT", "AMZN", "FB", "NFLX", "MCD", "WEN", "SHAK", "TSLA"]
+        self.actions = [SELL, BUY, HOLD]
 
-        # start out with 100 shares in each
+        # start out with 1000 shares in each
         for symbol in self.symbols:
-          self.portfolio[symbol] = 100
+          self.portfolio[symbol] = 1000
 
         # do not change this
         self.initial_portfolio = copy.deepcopy(self.portfolio)
@@ -50,19 +54,24 @@ class generalAgent:
         self.holdNum = 0
         self.data = {}
         self.feature_dict = {}
+        # helpful for technical indicators
+        self.ema_12 = {}
+        self.ema_26 = {}
+        for symbol in self.symbols:
+            self.ema_12[symbol] = 0.
+            self.ema_26[symbol] = 0.
 
     # Adds value to cash
     def addValue(self, val):
         self.cash += val
 
 
-    # this is the money you would have if you did nothing...
+    # this is the money you would have if you did nothing (stationary agent)
     def get_comparison(self):
         # assume that you have the current prices
         accumulator = self.initial_cash
         for symbol in self.symbols:
             accumulator += self.fetchPrice(symbol) * self.initial_portfolio[symbol]
-
         return accumulator
 
 
@@ -88,16 +97,66 @@ class generalAgent:
     def getPortfolio(self):
         return self.portfolio
 
-
     # use this to update prices as need be
     # make sure to call this every minute, getting the necessary info from api_caller
     def updateValues(self, feature_dict, past_prices):
-      self.feature_dict = feature_dict
-      self.past_prices = past_prices
+        self.feature_dict = feature_dict
+        self.past_prices = past_prices
 
     # instead of calling the API, this just goes through our dictionary
+
+    # below are some technical indicators, which range from price and volume to more technical computations
+
+    # list of the indicators that we have
+    # price (right now)
+    # volume
+    # simple moving average (of the last n prices)
+    # (WARNING, NEED 30 DATA POINTS TO USE THIS) moving average convergence difference (it's technical, but tells changing momentum) -- can't use until 30 data points
     def fetchPrice(self, symbol):
-      return self.feature_dict[symbol + " price"]
+        return self.feature_dict[symbol + " price"]
+
+    def fetchVolume(self, symbol):
+        return self.feature_dict[symbol + " volume"]
+
+    def simple_moving_average(self, symbol, n=10):
+        # returns the average price from the last n days
+        n = min(n, len(self.past_prices[symbol]))
+        add_to_me = 0.
+        for i in range(n):
+          add_to_me += (self.past_prices[symbol])[i]
+        return_me = float(add_to_me) / float(n)
+        return return_me
+
+    # the definition is technical, but this broadly gives a sense of changing momentum
+    def moving_average_convergence_difference(self, symbol):
+        # returns the difference of EMA_12 - EMA_26
+        # for definition of EMA, see see https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/ema
+        # basically, EMA is like moving average, weighted more towards the newest data point
+        # so MACD tells us how rapidly the stock is changing
+        if (len(self.past_prices[symbol]) < 28):
+            print "don't use this particular indicator until after 30 data points, returning 0"
+            return 0.
+        elif (self.ema_12[symbol] == 0. and self.ema_26[symbol] == 0.):
+            self.ema_12[symbol] = self.simple_moving_average(symbol, 12)
+            self.ema_26[symbol] = self.simple_moving_average(symbol, 26)
+
+        # to compute the new EMA for 12
+        past_12 = self.ema_12[symbol]
+        m_12 = 2. / (12. + 1.)
+        new_ema_12 = (self.fetchPrice(symbol) - past_12) * m_12 + past_12
+
+        # and for 26
+        past_26 = self.ema_26[symbol]
+        m_26 = 2. / (26. + 1.)
+        new_ema_26 = (self.fetchPrice(symbol) - past_26) * m_26 + past_26
+
+        self.ema_12[symbol] = new_ema_12
+        self.ema_26[symbol] = new_ema_26
+
+        macd = new_ema_12 - new_ema_26
+        return macd
+
+
 
 
     # Buying a given number of shares of one company, updating assets, cash, and networth.
@@ -138,7 +197,7 @@ class generalAgent:
 
 
     # always deals with amount of 1
-    def doTransactions(self, actions = [BUY, BUY, SELL, HOLD]):
+    def doTransactions(self, actions = [BUY, BUY, SELL, BUY, BUY, HOLD, BUY, SELL, HOLD]):
         for i, action in enumerate(actions):
             symbol = self.symbols[i]
             if action == BUY:
@@ -152,8 +211,12 @@ class generalAgent:
     # this is the bread and butter of our agent; it decides what to do for each
     def decide(self):
       # THIS IS WHAT NEEDS TO BE CUSTOMIZED
+
+
+
       # note that you have access to prices from the self.fetchPrice method
-      return [BUY, BUY, BUY, BUY]
+      # note that you want the list to be in order of the symbols here (there are 9 symbols)
+      return [BUY, BUY, BUY, BUY, SELL, BUY, BUY, BUY, BUY]
 
 
     def act(self):

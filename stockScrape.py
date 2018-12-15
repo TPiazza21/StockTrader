@@ -8,25 +8,27 @@ import urllib2
 from bs4 import BeautifulSoup
 from datetime import datetime
 import numpy
+import ssl
 
 def stockScraper(name):
-
     dataList = []
     stockDict = {name:[]}
     # LOOKS UP STOCK PAGE
+    # the gcontext line has something to do with security protocols...
+    gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
     quote_page = "https://www.nasdaq.com/symbol/" + name + "/real-time"
-    page = urllib2.urlopen(quote_page)
+    page = urllib2.urlopen(quote_page, context=gcontext)
     soup = BeautifulSoup(page, "html.parser")
 
     #FINDS PRICE
     priceHTML = soup.find("div", attrs={'class': "qwidget-dollar"})
     price = extractPrice(priceHTML)
-    
+
     #FINDS PERCENT CHANGE
     percentHTML = soup.find("span", attrs={'id': "quotes_content_left__PctChange"})
     percent = extractPercent(percentHTML)
-    
-    #FINDS VOLUME 
+
+    #FINDS VOLUME
     volumeHTML = soup.find("span", attrs={'id': "quotes_content_left__Volume"})
     volume = extractVolume(volumeHTML)
     volume = volume.replace(",", "")
@@ -38,10 +40,10 @@ def stockScraper(name):
     dataList.append(volume)
 
     stockDict[name] = dataList
-    print stockDict
+    #print stockDict
     return stockDict
 
-# HELPER FUNCTION TO GET PRICE 
+# HELPER FUNCTION TO GET PRICE
 def extractPrice(text):
     code = str(text)
     price = ""

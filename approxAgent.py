@@ -3,8 +3,8 @@
 from generalAgent import generalAgent
 
 HOLD = 0
-SELL = 1
-BUY = 2
+SELL = -1
+BUY = 1
 
 class approxAgent(generalAgent):
 
@@ -12,10 +12,8 @@ class approxAgent(generalAgent):
   def __init__(self):
     generalAgent.__init__(self)
 
-    #self.symbols = ["AAPL"]
-
-
-
+    # just so we don't deal with too many at a time for now
+    self.symbols = ["FB"]
 
     self.weights = {}
     # weights are a dictionary of dictionaries
@@ -46,23 +44,18 @@ class approxAgent(generalAgent):
     return self.marginal_reward(symbol)
   # where our agent is effectively 4 agents, one for each symbol, so we need a reward
   def marginal_reward(self, symbol):
-    # edit this...
     # basically, what is price now, what was price before, how much did I gain or lose with what we did
     reward = 0.
     # if you did BUY
     # then reward is price now - price before (times 1)
     if self.past_actions[symbol] == BUY:
-      #print "computing reward for buy, prices: " + str(self.past_prices[symbol][0]) + ", " + str(self.past_prices[symbol][1])
       reward = float(self.past_prices[symbol][0]) - float(self.past_prices[symbol][1])
     # opposite for sell, and 0 for hold
     elif self.past_actions[symbol] == SELL:
-      #print "past prices is " + str(self.past_prices[symbol])
-      #print "computing reward for sell, prices: " + str(self.past_prices[symbol][0]) + ", " + str(self.past_prices[symbol][1])
-      reward =  float(self.past_prices[symbol][1]) - float(self.past_prices[symbol][0])
-      #print "the actual reward from those subtractions are " + str(reward)
+      reward = float(self.past_prices[symbol][1]) - float(self.past_prices[symbol][0])
 
     elif self.past_actions[symbol] == HOLD:
-      reward =  self.past_prices[symbol][1] - self.past_prices[symbol][0]
+      reward = 0.
 
 
     return reward
@@ -84,12 +77,9 @@ class approxAgent(generalAgent):
     # only one weight right now
     #for symbol in self.symbols:
     #self.interesting_numbers[symbol + " price"] = self.feature_dict[symbol + " price"]
-    #self.interesting_numbers["only feature right now"] = self.past_prices["AAPL"][0] - self.past_prices["AAPL"][1]
-    for symbol in self.symbols:
-      self.interesting_numbers[symbol + " discrete derivative"] = self.past_prices[symbol][0] - self.past_prices[symbol][1]
-      #self.interesting_numbers[symbol + " volume"] = self.feature_dict[symbol + " volume"]
+    self.interesting_numbers["only feature right now"] = self.moving_average_convergence_difference("FB")
 
-
+    #self.past_prices["AAPL"][0] - self.past_prices["AAPL"][1]
 
 
     # initialize the weights
@@ -137,35 +127,28 @@ class approxAgent(generalAgent):
     for symbol in self.symbols:
 
       best_q = float("-inf")
+      best_action = BUY
       # first, find the max of the q values going from the state we are at now
       for action in self.actions:
         q_val = self.compute_Q(action, symbol)
         if q_val > best_q:
           best_q = q_val
-      # difference = r + discount * max_{a'}Q(s',a') - Q(s,a)
+          best_action = action
       # print "reward is " + str(self.reward(symbol))
       difference = (self.reward(symbol) + self.discount * best_q) - self.past_q[symbol]
 
       # w_i <- w_i + a * difference * f_i(s,a)
       for key in self.interesting_numbers:
-        # probably an issue with past_f
-        #print "alpha is " + str(self.alpha)
-        #print "difference is " + str(difference)
-        #print "past f is " + str(self.past_f[key])
-        #print "current weight is " + str(self.weights[symbol][key])
-
         self.weights[symbol][key] = self.weights[symbol][key] + self.alpha * difference * self.past_f[key]
         if abs(self.weights[symbol][key]) > 10 ** 20:
           print "weight is very big: updated weight is now " + str(self.weights[symbol][key])
 
-    # so we remember what the old f was
-    for key in self.interesting_numbers:
-      self.past_f[key] = self.compute_f(action, key)
+      # so we remember what the old f was
+      for key in self.interesting_numbers:
+        # you need it to be the best action
+        self.past_f[key] = self.compute_f(best_action, key)
 
     # update the learning rate, slowly
     self.alpha = (1. / 1.1) ** (self.t)
     self.t += 1.
-
-
-tester = approxAgent()
 
