@@ -16,11 +16,30 @@ Agent data:
 
 FROM FIRST_DATA.CSV (i.e. the agent runs, as if it was the same time as first_data.csv)
 
+In the folder approxAgentData
+
 Approximate Q - Learning agent (uses approxAgent.py)
 
 -fixed_approx_just_apple_just_derivative.csv --> an agent that only BUYs or SELLs a single share of apple, using the feature that is just the derivative. Note that "base case" is an agent that starts out with the same materials, but never BUYs or SELLs.
 
 -fixed_approx_all_stocks_just_derivative.csv --> agent that only BUYs or SELLs a single share of apple, microsoft, amazon, facebook, using only the derivative as a feature.
+
+-second_data_all_stocks_with_bostemp_boshumid_MACDSMAdiffsimplederiv.csv --> note that the weights blew right up, and the graph is pretty bad. This is good to show as a proof that certain things didn't matter
+
+-   second_data_all_stocks_with_bostemp_MACDSMAdiffsimplederiv.csv
+this file is successful, but overall weather shouldn't be trusted. This just used boston temperature, and the weight is below 62046906.7691
+
+    In approxGoodData
+        
+    - each file is titled with which dataset it's from (second, third, or 4th). All three use all 9 stocks, all three use the 3 intresting numbers (MACD, SMA difference, and simple derivative). Overall, we had very good success in 2nd and 3rd, and the 4th was good until the end when it completely tanks
+    - the weights corresponding to a (symbol, key) pair are also there
+    
+    
+In the folder regressionAgentData
+
+This is the agent that uses regression to predict if the price is going up or down
+
+In regressionGoodData, there are 6 files, 3 for linear and 3 for poly. The linear files correspond to an agent that looks at n=10 past prices and uses linear regression to predict the slope, and then buys if the slope is going down (i.e. with the hope that it will then go up) and sells if the slope is going up. Poly uses n=20 past prices with a degree m=7 polynomial, uses the derivative at zero at determine the "slope", and uses the same reasoning from linear. As one might expect, this m=7 degree polynomial is not very reliable, but it often does make good money in these 3 test cases
 
 
 

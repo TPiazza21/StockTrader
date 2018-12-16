@@ -1,9 +1,10 @@
-# running data from a csv
+# Tyler Piazza
+# run regression agent
 
 import csv
 from api_caller import APICaller
 from generalAgent import generalAgent
-from approxAgent import approxAgent
+from regressionAgent import regressionAgent
 
 
 first_time = True
@@ -11,10 +12,10 @@ second_time = True
 
 # initialize the agents
 api_source = APICaller()
-approx_test_agent = approxAgent()
+regression_agent = regressionAgent(isLinear = False)
 
 # decide which file to pull from
-f = open('retrievingData/fourth_data.csv')
+f = open('retrievingData/second_data.csv')
 csv_f = csv.reader(f)
 keys = []
 
@@ -32,7 +33,7 @@ for row in csv_f:
   if second_time:
     #print "at second time"
     api_source.take_in_array(row, keys)
-    approx_test_agent.updateValues(api_source.get_dict(), api_source.return_last_prices())
+    regression_agent.updateValues(api_source.get_dict(), api_source.return_last_prices())
     second_time = False
     continue
 
@@ -46,48 +47,33 @@ for row in csv_f:
 
   print "*"
   api_source.take_in_array(row, keys)
-  approx_test_agent.updateValues(api_source.get_dict(), api_source.return_last_prices())
-  approx_test_agent.act()
-  print (str(approx_test_agent.sellNum), str(approx_test_agent.buyNum))
+  regression_agent.updateValues(api_source.get_dict(), api_source.return_last_prices())
+  regression_agent.act()
+  print (str(regression_agent.sellNum), str(regression_agent.buyNum))
 
-  approx_val = approx_test_agent.getNetWorth()
-  base_case = approx_test_agent.get_comparison()
+  regression_agent_val = regression_agent.getNetWorth()
+  base_case = regression_agent.get_comparison()
 
   #print "the approx agent makes"
-  print approx_val
+  print regression_agent_val
 
   #print "an agent that did nothing would make below"
   print base_case
 
   #print "this is the amount we did better"
-  print (approx_val - base_case)
+  print (regression_agent_val - base_case)
 
-  values_to_save.append([approx_val, base_case, (approx_val - base_case)])
+  values_to_save.append([regression_agent_val, base_case, (regression_agent_val - base_case)])
+
+
+
+
 
 # for writing a csv
 
-title_row = []
-value_row = []
-# now, put in the weights of each factor
-for symbol in approx_test_agent.symbols:
-  for key in approx_test_agent.weights[symbol]:
-    title_row.append(symbol + " : " + key)
-    value_row.append(approx_test_agent.weights[symbol][key])
-
-
-
-
-print title_row
-print value_row
-
-values_to_save.append(title_row)
-values_to_save.append(value_row)
-
-
-
 # PLEASE change the name of the file so that it doesn't overrite what is there
 """
-with open('retrievingData/changeMYNAME.csv', mode='w') as write_file:
+with open('retrievingData/regressionAgentData/changeMYNAME.csv', mode='w') as write_file:
     file_writer = csv.writer(write_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for row in values_to_save:
       file_writer.writerow(row)
