@@ -19,6 +19,9 @@ class generalAgent:
         # Total cash value - starting out with some cash, a lot of cash
         self.cash = 100000000.0
         self.initial_cash = self.cash
+
+        self.past_prices = {}
+        
         # Total portfolio value
         self.assets = 0.0
         # Total cash and assets values (NOT JUST UNINVESTED CASH)
