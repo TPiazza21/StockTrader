@@ -8,6 +8,8 @@ Things that must be downloaded for this to work:
 - pip install pytrends
 - pip install beautifulsoup4
 
+- you may also need numpy for the regression agent
+
 
 Also, don't be worried about Google errors, they are par for the course when getting google trends data
 

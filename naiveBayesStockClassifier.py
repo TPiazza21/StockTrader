@@ -32,7 +32,7 @@ class StockClassifier():
             nflxPrices.append(row[23])
         history = {0: wenPrices, 1: msftPrices, 2: shakPrices, 3: amznPrices, 4: mcdPrices, 5: fbPrices, 6: aaplPrices, 7: tslaPrices, 8: nflxPrices}
         return (minutes,history)
-        
+
     BUY = 0
     SELL = 1
     HOLD = 2
@@ -84,14 +84,14 @@ class StockClassifier():
                             matched += 1
                         total += 1
                 accuracy = (float(matched) - 1)  / (float(total) - 1)
-                accList.append(accuracy) 
+                accList.append(accuracy)
                 print "Accuracy for " + company + ": " + str(int(accuracy * 100)) + "%"
             # runningSum = 0
             # for acc in accList:
             #     runningSum += (acc**2)
             # norm = sqrt(runningSum)
             # return norm
-    
+
         # LIST OF GUESSED RANKINGS BASED ON LINE NUMBER
         lst = []
         (minutes, history) = self.populatePrices(infile)
