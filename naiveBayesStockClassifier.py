@@ -83,7 +83,6 @@ class StockClassifier():
         (minutes, history) = self.populatePrices(infile)
         for key in range(len(self.dict)):
             prices = history[key]
-            amount = [0,0,0]
             # Stores temporary count list since mutating self.counts gave problems for some unknown reason
             temp = [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]]
             for j in range (10, minutes - 2):
