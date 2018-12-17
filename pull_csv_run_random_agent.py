@@ -14,7 +14,7 @@ api_source = APICaller()
 random_test_agent = randomAgent()
 
 # decide which file to pull from
-f = open('retrievingData/fourth_data.csv')
+f = open('retrievingData/second_data.csv')
 csv_f = csv.reader(f)
 keys = []
 
@@ -29,7 +29,7 @@ for row in csv_f:
     first_time = False
     continue
 
-  if second_time:
+  """ if second_time:
     #print "at second time"
     api_source.take_in_array(row, keys)
     random_test_agent.updateValues(api_source.get_dict(), api_source.return_last_prices())
@@ -40,7 +40,7 @@ for row in csv_f:
   if counter < 40:
     # we wait 40 so that macd is valid to compute
     api_source.take_in_array(row, keys)
-    continue
+    continue """
 
 
 
@@ -66,22 +66,10 @@ for row in csv_f:
 
 # for writing a csv
 
-title_row = []
-value_row = []
-# now, put in the weights of each factor
-for symbol in random_test_agent.symbols:
-  for key in random_test_agent.weights[symbol]:
-    title_row.append(symbol + " : " + key)
-    value_row.append(random_test_agent.weights[symbol][key])
-
-
-
-
-print title_row
-print value_row
-
-values_to_save.append(title_row)
-values_to_save.append(value_row)
+with open('retrievingData/second_data_random_all_stocks_3.csv', mode='w') as write_file:
+    file_writer = csv.writer(write_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    for row in values_to_save:
+      file_writer.writerow(row)
 
 
 
