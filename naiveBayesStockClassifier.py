@@ -4,12 +4,15 @@ from math import log, sqrt
 from generalAgent import generalAgent
 import csv
 
-class StockClassifier():
+HOLD = 0
+SELL = -1
+BUY = 1
+
+class StockClassifier(generalAgent):
 
     # This alpha is stored purely for comparison purposes
     def __init__(self):
         self.alpha = 1
-    
     # Takes in a percent and determines the appropriate index for our state space
     def findIndex(self, percent):
         absol = abs(percent)
@@ -239,6 +242,68 @@ class StockClassifier():
             self.alpha = alpha
         return bestAlpha
 
+    def convertDecisions(self, decisions):
+        newList = []
+        for stock in decisions:
+            stockChoices = []
+            for choice in stock:
+                if choice == 0:
+                    stockChoices.append(1)
+                elif choice == 1:
+                    stockChoices.append(-1)
+                elif choice == 2:
+                    stockChoices.append(0)
+            newList.append(stockChoices)
+        return newList
+
+    def findNetWorth(self, cash, stocks, currentPrices):
+            networth = 0.0
+            for i, amount in enumerate(stocks):
+                price = currentPrices[i]
+                networth += (amount * float(price))
+            networth += cash
+            return networth
+    def makeDecisions(self, decisions, infile):
+        cash = 100000000.0
+        ownership = [1000,1000,1000,1000,1000,1000,1000,1000,1000]
+        oldcash = cash
+        (_, priceHistory) = self.populatePrices(infile)
+        currentPrices = []
+        for r in range(len(priceHistory)):
+            currentPrices.append(priceHistory[r][10])
+        oldNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        for j, company in enumerate(decisions):
+            prices = priceHistory[j]
+            for i, choice in enumerate(company):
+                if choice == 1:
+                    cash -= float(prices[10 + i])
+                    ownership[j] += 1
+                elif choice == -1:
+                    cash += float(prices[10 + i])
+                    ownership[j] -= 1
+                if i == len(company) - 1:
+                    currentPrices[j] = prices[i]
+        newNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        return newNetWorth - oldNetWorth
+
+    def holdAgent(self, infile):
+        cash = 100000000.0
+        ownership = [1000,1000,1000,1000,1000,1000,1000,1000,1000]
+        (_, priceHistory) = self.populatePrices(infile)
+        currentPrices = []
+        for r in range(len(priceHistory)):
+            currentPrices.append(priceHistory[r][10])
+        oldNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        (_, priceHistory) = self.populatePrices(infile)
+        for j in range(9):
+            prices = priceHistory[j]
+            for i in range(277):
+                if i == 276:
+                    currentPrices[j] = prices[i]
+        newNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        return newNetWorth - oldNetWorth
+
+
 # Runs program and queries the data sets
 if __name__ == '__main__':
     c = StockClassifier()
@@ -247,5 +312,12 @@ if __name__ == '__main__':
     print len(c.dict), "words in dictionary"
     print "Fitting model..."
     c.fit()
-    c.test('retrievingData/third_data.csv')
+    (decision, _) = c.test('retrievingData/third_data.csv')
+    convertedChoices = c.convertDecisions(decision)
+    profit = c.makeDecisions(convertedChoices, 'retrievingData/third_data.csv')
     print "Good alpha:", c.findBestAlpha('retrievingData/third_data.csv')
+    print "Loss " + str(profit)
+    holdProfit = c.holdAgent('retrievingData/third_data.csv')
+    print "Hold Agent" + str(holdProfit)
+    print "Our agent performs " + str(holdProfit/profit) + " times better than a hold agent"
+
