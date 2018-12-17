@@ -4,39 +4,42 @@ from math import log, sqrt
 from generalAgent import generalAgent
 import csv
 
-class StockClassifier():
+HOLD = 0
+SELL = -1
+BUY = 1
+
+class StockClassifier(generalAgent):
 
     # This alpha is stored purely for comparison purposes
     def __init__(self):
         self.alpha = 1
-    
     # Takes in a percent and determines the appropriate index for our state space
     def findIndex(self, percent):
         absol = abs(percent)
         if absol > .4:
             if percent < 0:
                 return 0
-            else: 
+            else:
                 return 9
         elif absol <= .4 and absol > .3:
             if percent < 0:
                 return 1
-            else: 
+            else:
                 return 8
         elif absol <= .3 and absol > .2:
             if percent < 0:
                 return 2
-            else: 
+            else:
                 return 7
         elif absol <= .2 and absol > .1:
             if percent < 0:
                 return 3
-            else: 
+            else:
                 return 6
         elif absol <= .1 and absol > .0:
             if percent < 0:
                 return 4
-            else: 
+            else:
                 return 5
         else:
             return 10
@@ -71,12 +74,6 @@ class StockClassifier():
         history = {0: wenPrices, 1: msftPrices, 2: shakPrices, 3: amznPrices, 4: mcdPrices, 5: fbPrices, 6: aaplPrices, 7: tslaPrices, 8: nflxPrices}
         return (minutes,history)
 
-<<<<<<< HEAD
-    BUY = 0
-    SELL = 1
-    HOLD = 2
-=======
->>>>>>> c4ec6106a3ac2742eea38390bc7303e98a28b92d
     def train(self, infile):
         # Initialize self.dict
         self.dict = {"WEN": 0, "MSFT":1,"SHAK": 2,"AMZN":3, "MCD":4, "FB":5, "AAPL":6, "TSLA":7, "NFLX":8}
@@ -139,7 +136,7 @@ class StockClassifier():
                 for k in range(len(count[0])):
                     # Count total number of items in the action
                     denom = float(sum(count[i]) + (alpha * len(count[i])))
-                    # Count total number of items in the action given SMA % difference 
+                    # Count total number of items in the action given SMA % difference
                     numer = float(alpha + count[i][k])
 
                     if not numer == 0.0:
@@ -169,16 +166,6 @@ class StockClassifier():
                 accuracy = (float(matched) - 1)  / (float(total) - 1)
                 accList.append(accuracy)
                 print "Accuracy for " + company + ": " + str(int(accuracy * 100)) + "%"
-<<<<<<< HEAD
-            # runningSum = 0
-            # for acc in accList:
-            #     runningSum += (acc**2)
-            # norm = sqrt(runningSum)
-            # return norm
-
-        # LIST OF GUESSED RANKINGS BASED ON LINE NUMBER
-        lst = []
-=======
             # Calculates norm of each accuracy so we can maximize it with the right alpha later
             runningSum = 0
             for acc in accList:
@@ -186,7 +173,6 @@ class StockClassifier():
             norm = sqrt(runningSum)
             return norm
 
->>>>>>> c4ec6106a3ac2742eea38390bc7303e98a28b92d
         (minutes, history) = self.populatePrices(infile)
         actualResults = [[None] * (minutes - 2) for _ in range(len(self.dict))]
         # Labels each timestep using all data to compare to classifier later
@@ -231,7 +217,7 @@ class StockClassifier():
                 companyGuesses.append(minAction)
             lst.append(companyGuesses)
             newActual = []
-            # Sanitizes our actual results since the first 10 minutes are omitted from the 
+            # Sanitizes our actual results since the first 10 minutes are omitted from the
             # decision tree due to the SMA needing to go back 10 minutes in time
             for comp in actualResults:
                 timeLapse = []
@@ -256,6 +242,68 @@ class StockClassifier():
             self.alpha = alpha
         return bestAlpha
 
+    def convertDecisions(self, decisions):
+        newList = []
+        for stock in decisions:
+            stockChoices = []
+            for choice in stock:
+                if choice == 0:
+                    stockChoices.append(1)
+                elif choice == 1:
+                    stockChoices.append(-1)
+                elif choice == 2:
+                    stockChoices.append(0)
+            newList.append(stockChoices)
+        return newList
+
+    def findNetWorth(self, cash, stocks, currentPrices):
+            networth = 0.0
+            for i, amount in enumerate(stocks):
+                price = currentPrices[i]
+                networth += (amount * float(price))
+            networth += cash
+            return networth
+    def makeDecisions(self, decisions, infile):
+        cash = 100000000.0
+        ownership = [1000,1000,1000,1000,1000,1000,1000,1000,1000]
+        oldcash = cash
+        (_, priceHistory) = self.populatePrices(infile)
+        currentPrices = []
+        for r in range(len(priceHistory)):
+            currentPrices.append(priceHistory[r][10])
+        oldNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        for j, company in enumerate(decisions):
+            prices = priceHistory[j]
+            for i, choice in enumerate(company):
+                if choice == 1:
+                    cash -= float(prices[10 + i])
+                    ownership[j] += 1
+                elif choice == -1:
+                    cash += float(prices[10 + i])
+                    ownership[j] -= 1
+                if i == len(company) - 1:
+                    currentPrices[j] = prices[i]
+        newNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        return newNetWorth - oldNetWorth
+
+    def holdAgent(self, infile):
+        cash = 100000000.0
+        ownership = [1000,1000,1000,1000,1000,1000,1000,1000,1000]
+        (_, priceHistory) = self.populatePrices(infile)
+        currentPrices = []
+        for r in range(len(priceHistory)):
+            currentPrices.append(priceHistory[r][10])
+        oldNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        (_, priceHistory) = self.populatePrices(infile)
+        for j in range(9):
+            prices = priceHistory[j]
+            for i in range(277):
+                if i == 276:
+                    currentPrices[j] = prices[i]
+        newNetWorth = self.findNetWorth(cash, ownership, currentPrices)
+        return newNetWorth - oldNetWorth
+
+
 # Runs program and queries the data sets
 if __name__ == '__main__':
     c = StockClassifier()
@@ -264,5 +312,11 @@ if __name__ == '__main__':
     print len(c.dict), "words in dictionary"
     print "Fitting model..."
     c.fit()
-    c.test('retrievingData/third_data.csv')
+    (decision, _) = c.test('retrievingData/third_data.csv')
+    convertedChoices = c.convertDecisions(decision)
+    profit = c.makeDecisions(convertedChoices, 'retrievingData/third_data.csv')
     print "Good alpha:", c.findBestAlpha('retrievingData/third_data.csv')
+    print "Loss " + str(profit)
+    holdProfit = c.holdAgent('retrievingData/third_data.csv')
+    print "Hold Agent" + str(holdProfit)
+    print "Our agent performs " + str(holdProfit/profit) + " times better than a hold agent"

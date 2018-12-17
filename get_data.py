@@ -11,10 +11,9 @@ import datetime
 
 import csv
 
-# number of minutes to wait. If I get up at 7:50am, a 2 hour wait should be good
 # make sure battery settings are good
 
-# starting at 1 am, ish. if not running by 11am, something is fishy
+
 waittime = 60 * 9
 print "starting the waittime - make sure battery is fine"
 time.sleep(waittime * 60)
@@ -33,8 +32,6 @@ keys = []
 for key in first_dict:
   keys.append(key)
 
-# change battery settings on computer to run longer
-# stock market open 9:30am - 4pm Eastern time
 minutes_to_run = 5 * 60 # number of minutes until it stops
 
 remember_rows = [] # list of lists, to put in csv
@@ -81,9 +78,10 @@ while counter < minutes_to_run:
 
 
 
-
+"""
 # for writing a csv
 # PLEASE change the name of the file so that it doesn't overrite what is there
 with open(file_name, mode='w') as write_file:
     file_writer = csv.writer(write_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     file_writer.writerows(remember_rows)
+"""
