@@ -37,8 +37,9 @@ for row in csv_f:
     continue
 
 
-  if counter <= 10:
-    # we wait 10 so that we have a valid last10 to compute sma
+  if counter < 40:
+    # we wait 40 so that we have a valid last10 to compute sma, as well as to be consistent
+    # with other agent tests
     api_source.take_in_array(row, keys)
     continue
 
@@ -86,7 +87,7 @@ values_to_save.append(value_row)
 
 # PLEASE change the name of the file so that it doesn't overrite what is there
 """
-with open('retrievingData/fourth_data_take3_e0_qLearning_all_stocks.csv', mode='w') as write_file:
+with open('retrievingData/changeMYNAME', mode='w') as write_file:
     file_writer = csv.writer(write_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for row in values_to_save:
       file_writer.writerow(row)
