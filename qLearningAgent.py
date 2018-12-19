@@ -5,7 +5,6 @@ import random
 
 HOLD = 0
 SELL = -1
-# I changed it to 1
 BUY = 1
 
 class qLearningAgent(generalAgent):
@@ -34,7 +33,11 @@ class qLearningAgent(generalAgent):
 		self.alpha = 1.0
 		self.discount = 0.99
 		# epsilon, prob choose random action instead of one w best q - goes down over time
-		self.epsilon = 0.
+		self.epsilon = 1.
+
+		# variable for whether or not to shuffle actions before sampling in calculation
+		# of best action in decide()
+		self.shuffle = False
 
 		# dictionary of past q_values
     	# self.past_q = {}
@@ -79,18 +82,7 @@ class qLearningAgent(generalAgent):
 		state = self.assign_state(percent)
 		return state
 
-    # use to assign other agents to same qValues
-	def getQValues(self):
-		return self.qValues
-
-	# use to get qValues from preexisting agent
-	def setQValues(self, qValues):
-		self.qValues = qValues
-
-	""" def reward(self, symbol):
-		# eventually consider different reward schemes, like one that actually uses total prices
-		return self.marginal_reward(symbol) """
-    # same reward as in approxAgent
+    # same reward as in approxAgent, but condensed a bit
 	def reward(self, symbol):
 		# basically, what is price now, what was price before, how much did I gain or lose with what we did
 		action = self.past_actions[symbol]
@@ -112,6 +104,17 @@ class qLearningAgent(generalAgent):
 		q_value = self.qValues[symbol][state, action]
 		return q_value
 
+	# this function to produce a shuffled list so for a list of actions decide
+	# doesn't always take the first if the values are all 0
+	def shuffle(self, lst):
+		old = list(lst)
+		new = []
+		while len(old) > 0:
+			i = random.randint(0, len(old) - 1)
+			new.append(old.pop(i))
+		return new
+
+
 	def decide(self):
 		actions = []
 		# decide an action for each symbol, with prob epsilon of random action
@@ -119,7 +122,13 @@ class qLearningAgent(generalAgent):
 			best_action = BUY
 			if (random.uniform(0,1) > self.epsilon):
 				best_q = -float('inf')
-				for action in self.actions:
+				# either rearrange actions before sampling or always sample in fixed order
+				if self.shuffle:
+					actions_to_investigate = self.shuffle(self.actions)
+				else:
+					actions_to_investigate = self.actions
+
+				for action in actions_to_investigate:
 					q_val = self.compute_Q(action, symbol)
 					if q_val > best_q:
 						best_q = q_val
