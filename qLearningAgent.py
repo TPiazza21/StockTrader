@@ -5,7 +5,8 @@ import random
 
 HOLD = 0
 SELL = -1
-BUY = -1
+# I changed it to 1
+BUY = 1
 
 class qLearningAgent(generalAgent):
 
@@ -47,27 +48,27 @@ class qLearningAgent(generalAgent):
 		if absol > .4:
 			if percent < 0:
 				state = 0
-			else: 
+			else:
 				state = 9
 		elif absol <= .4 and absol > .3:
 			if percent < 0:
 				state = 1
-			else: 
+			else:
 				state = 8
 		elif absol <= .3 and absol > .2:
 			if percent < 0:
 				state = 2
-			else: 
+			else:
 				state = 7
 		elif absol <= .2 and absol > .1:
 			if percent < 0:
 				state = 3
-			else: 
+			else:
 				state = 6
 		else:
 			if percent < 0:
 				state = 4
-			else: 
+			else:
 				state = 5
 		return state
 
@@ -78,7 +79,7 @@ class qLearningAgent(generalAgent):
 		state = self.assign_state(percent)
 		return state
 
-    # use to assign other agents to same qValues        
+    # use to assign other agents to same qValues
 	def getQValues(self):
 		return self.qValues
 
@@ -117,7 +118,7 @@ class qLearningAgent(generalAgent):
 		for symbol in self.symbols:
 			best_action = BUY
 			if (random.uniform(0,1) > self.epsilon):
-				best_q = -float('inf') 
+				best_q = -float('inf')
 				for action in self.actions:
 					q_val = self.compute_Q(action, symbol)
 					if q_val > best_q:
