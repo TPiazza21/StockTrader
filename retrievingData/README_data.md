@@ -1,5 +1,13 @@
 # StockTrader
+This file is meant to describe the data files that are here, but skip if you only need to access second_data.csv, third_data.csv, fourth_data.csv.
+
+
+
+
+
 Inside the folder "retrievingData", there are broadly two types of .csv files: those that are raw data (price, weather, volumes, etc.), and those that are data from our agents.
+
+
 
 Raw Data: (which was generally run via the python file "get_data.py" BEWARE SAVING TO THE SAME FILE NAME)
 
@@ -11,6 +19,16 @@ second_data.csv -- this file is from Monday, December 10th, 10:06am, and it ran 
 third_data.csv -- this file is from Thursday, December 13th, 10:02am, ran until about 3pm that day. Same info from second_data (i.e. same price info and same weather info)
 
 fourth_data.csv -- this file is from Friday, December 14th, 10:00am to about 3pm. Same info as previous 2 raw files
+
+
+
+
+
+
+
+
+
+
 
 Agent data:
 

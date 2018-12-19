@@ -14,7 +14,7 @@ import csv
 # make sure battery settings are good
 
 
-waittime = 60 * 9
+waittime = 0
 print "starting the waittime - make sure battery is fine"
 time.sleep(waittime * 60)
 print "finished the waittime"
@@ -71,10 +71,13 @@ while counter < minutes_to_run:
 
   # write to the file every 10 minutes just in the event of an error
   if (counter % 10) == 0:
+    pass
+    """
     print "Saving a copy"
     with open(file_name, mode='w') as write_file:
       file_writer = csv.writer(write_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
       file_writer.writerows(remember_rows)
+    """
 
 
 

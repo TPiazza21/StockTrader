@@ -72,11 +72,12 @@ for row in csv_f:
 # for writing a csv
 
 # PLEASE change the name of the file so that it doesn't overrite what is there
-
+"""
 with open('retrievingData/regressionAgentData/changeMYNAME.csv', mode='w') as write_file:
     file_writer = csv.writer(write_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for row in values_to_save:
       file_writer.writerow(row)
+"""
 
 
 
